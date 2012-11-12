@@ -2,7 +2,7 @@
 
 (function(){
    
-   /* Parsing */
+   /* Bytecode */
    function GetLocals() {
       this.type = 'locals' }
    function Juxtapose() {
@@ -14,6 +14,7 @@
       this.type = 'label'
       this.contents = string }
    
+   /* Parsing */
    function parse(text) { var i = 0
       , character = function(c){ return text[i] === c && ++i }
       , whitespace = function(){ while (character(' ')); return true }
