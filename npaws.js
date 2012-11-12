@@ -56,18 +56,18 @@
       
       return expr() }
    
-      /* Execution */
+   /* Execution */
       
-      /* TODO */
+   /* TODO */
       
-      /* Staging */
+   /* Staging */
       
-      /* TODO */
+   /* TODO */
       
-      /* Wrap it all up */
+   /* Wrap it all up */
       
-      function run(text) {
-         /* TODO */ }
+   function run(text) {
+      /* TODO */ }
    
    console.log(parse('hi (a b c) {c d f (a b)}'))
 })();
