@@ -2,17 +2,34 @@
 
 (function(){
    
+   /* Things */
+   function Thing() {
+      this.members = [] }
+   function Execution(code) {
+      Thing.call(this)
+      if (typeof code === 'function') {
+         this.native = code }
+      else {
+         this.code = code
+         this.stack = []
+         this.locals = new Thing() } }
+   function Label(string) {
+      Thing.call(this)
+      this.string = string }
+   
+   Thing.prototype.handler = function(argument) {
+      for (var i = 0; i < this.properties.length; i++) {
+         if (this.properties[i].key.string === argument.string) return this.members[i].value }
+      return null; }
+   
    /* Bytecode */
    function GetLocals() {
       this.type = 'locals' }
    function Juxtapose() {
       this.type = 'juxtapose' }
-   function Scope(contents) {
-      this.type = 'scope'
+   function Value(contents) {
+      this.type = 'value'
       this.contents = contents }
-   function Label(string) {
-      this.type = 'label'
-      this.contents = string }
    
    /* Parsing */
    function parse(text) { var i = 0
@@ -26,11 +43,11 @@
       , paren = function() {
          return bracket('(', ')') }
       , scope = function() { var result
-         return (result = bracket('{', '}')) && [new Scope(result)] }
+         return (result = bracket('{', '}')) && [new Value(new Execution(result))] }
       , label = function(){ whitespace(); var result = ''
            while ( text[i] && /[^(){} ]/.test(text[i]) )
               result = result.concat(text[i++])
-           return result && [new Label(result)] }
+           return result && [new Value(new Label(result))] }
       
       , expr = function(){ var term, result = [new GetLocals()]
          while (term = paren() || scope() || label())
@@ -38,6 +55,19 @@
          return result }
       
       return expr() }
+   
+      /* Execution */
+      
+      /* TODO */
+      
+      /* Staging */
+      
+      /* TODO */
+      
+      /* Wrap it all up */
+      
+      function run(text) {
+         /* TODO */ }
    
    console.log(parse('hi (a b c) {c d f (a b)}'))
 })();
