@@ -63,17 +63,19 @@
    Stage = {}
    Stage.queue = []
    
-   function Staging(execution, value) {
-      this.execution = execution
+   function Staging(stagee, value) {
+      this.stagee = stagee
       this.value = value }
    
-   Stage.stage = function(execution, value) {
-      Stage.queue.push(new Staging(execution, value)) }
+   Stage.stage = function(stagee, value) {
+      Stage.queue.push(new Staging(stagee, value)) }
    
    Stage.next = function() {
       var staging = Stage.queue.shift()
-      if (staging.execution.native) {
-         staging.execution.native(staging.value) } }
+      if (staging.stagee.native) {
+         staging.execution.native(staging.value) }
+      else if (staging.execution.handler.native) {
+         staging.execution.handler.native(staging.value) } }
       
    /* Wrap it all up */
    function run(text) {
@@ -85,4 +87,5 @@
    var print = new Execution(function(label) { console.log(label.string) })
    Stage.stage(print, new Label('hi'))
    Stage.next()
+   
 })();
