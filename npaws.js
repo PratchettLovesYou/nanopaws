@@ -16,12 +16,7 @@
    function Label(string) {
       Thing.call(this)
       this.string = string }
-   
-   Thing.prototype.handler = function(argument) {
-      for (var i = 0; i < this.properties.length; i++) {
-         if (this.properties[i].key.string === argument.string) return this.members[i].value }
-      return null; }
-   
+      
    /* Bytecode */
    function GetLocals() {
       this.type = 'locals' }
@@ -57,17 +52,37 @@
       return expr() }
    
    /* Execution */
-      
-   /* TODO */
-      
+   Thing.prototype.handler = new Execution(function(value) { /*
+      for (var i = 0; i < this.properties.length; i++) {
+         if (this.properties[i].key.string === value.string) return this.members[i].value }
+      return null; */ })
+   Execution.prototype.handler = new Execution(function(value) {
+      })
+   
    /* Staging */
-      
-   /* TODO */
+   Stage = {}
+   Stage.queue = []
+   
+   function Staging(execution, value) {
+      this.execution = execution
+      this.value = value }
+   
+   Stage.stage = function(execution, value) {
+      Stage.queue.push(new Staging(execution, value)) }
+   
+   Stage.next = function() {
+      var staging = Stage.queue.shift()
+      if (staging.execution.native) {
+         staging.execution.native(staging.value) } }
       
    /* Wrap it all up */
-      
    function run(text) {
-      /* TODO */ }
+      stage(new Execution(parse(text)), null)
+      while (queue.length > 0) {
+         Stage.next() } }
    
-   console.log(parse('hi (a b c) {c d f (a b)}'))
+   /* Testing */
+   var print = new Execution(function(label) { console.log(label.string) })
+   Stage.stage(print, new Label('hi'))
+   Stage.next()
 })();
