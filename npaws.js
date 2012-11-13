@@ -43,16 +43,20 @@
       , scope = function() { var result
          return (result = bracket('{', '}')) && [new Value(new Execution(result))] }
       , label = function(){ whitespace(); var result = ''
-           while ( text[i] && /[^(){} ]/.test(text[i]) )
+           while ( text[i] && /[^(){} \n]/.test(text[i]) )
               result = result.concat(text[i++])
            return result && [new Value(new Label(result))] }
       
-      , expr = function(){ var term, result = [new GetLocals()]
+      , expr = function() { var term, result = [new GetLocals()]
          while (term = paren() || scope() || label())
             result = result.concat(term).concat(new Juxtapose())
          return result }
+      , program = function() { var line, result = expr()
+         while (character('\n') && (line = expr()))
+            result = result.concat(line)
+         return result }
       
-      return expr() }
+      return program() }
    
    /* Execution */
    Thing.prototype.handler = new Execution(function(left, right, context) {
@@ -97,11 +101,16 @@
    run = function(text) { var execution = new Execution(parse(text))
       execution.locals.members.push(new Association(new Label('print'), new Execution(function(label) {
          console.log(label.text) })))
+      execution.locals.members.push(new Association(new Label('set'), new Execution(function(label, context) {
+         Stage.stage(context, new Execution(function(value) {
+            context.locals.members.push(new Association(label, value)) })) })))
+      execution.locals.members.push(new Association(new Label('a'), new Label('b')))
       Stage.stage(execution, null)
       while (Stage.queue.length > 0) {
-         Stage.next() } }
+         Stage.next()
+         if (Stage.queue.length == 0 && execution.code.length > 0) Stage.stage(execution, null) } }
    
    /* Testing */
-   run('print asdf')
+   run('set x y \n print (x)')
       
 })();
