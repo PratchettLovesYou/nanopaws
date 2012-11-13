@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-//(function(){
+(function(){ var Thing, Execution, Label, Association, GetLocals, Juxtapose, Value, parse, Stage, Staging
    
    /* Things */
    Thing = function() {
@@ -104,4 +104,4 @@
    /* Testing */
    run('print asdf')
       
-//})();
+})();
