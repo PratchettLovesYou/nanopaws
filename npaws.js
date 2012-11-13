@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-(function(){
+//(function(){
    
    /* Things */
-   function Thing() {
+   Thing = function() {
       this.members = [] }
-   function Execution(code) {
+   Execution = function(code) {
       Thing.call(this)
       if (typeof code === 'function') {
          this.native = code }
@@ -13,21 +13,24 @@
          this.code = code
          this.stack = []
          this.locals = new Thing() } }
-   function Label(string) {
+   Label = function(text) {
       Thing.call(this)
-      this.string = string }
+      this.text = text }
+   Association = function(key, value) {
+      this.key = key
+      this.value = value }
       
    /* Bytecode */
-   function GetLocals() {
+   GetLocals = function() {
       this.type = 'locals' }
-   function Juxtapose() {
+   Juxtapose = function() {
       this.type = 'juxtapose' }
-   function Value(contents) {
+   Value = function(contents) {
       this.type = 'value'
       this.contents = contents }
    
    /* Parsing */
-   function parse(text) { var i = 0
+   parse = function(text) { var i = 0
       , character = function(c){ return text[i] === c && ++i }
       , whitespace = function(){ while (character(' ')); return true }
       , bracket = function(begin, end) { var result
@@ -52,40 +55,64 @@
       return expr() }
    
    /* Execution */
-   Thing.prototype.handler = new Execution(function(value) { /*
-      for (var i = 0; i < this.properties.length; i++) {
-         if (this.properties[i].key.string === value.string) return this.members[i].value }
-      return null; */ })
-   Execution.prototype.handler = new Execution(function(value) {
-      })
+   Thing.prototype.handler = new Execution(function(left, right, context) { console.log('looking up')
+      for (var i = 0; i < left.members.length; i++) {
+         if (left.members[i].key.text === right.text) { Stage.stage(context, left.members[i].value) } }
+         return null; })
+   Execution.prototype.handler = new Execution(function(left, right, context) { var instruction
+      if (left.code) {
+         left.stack.push(right)
+         while (left.code.length > 0) { instruction = left.code.shift()
+            switch (instruction.type) {
+               case 'locals':
+                  left.stack.push(left.locals); console.log('pushing locals')
+               break; case 'value':
+                  left.stack.push(instruction.contents); console.log('pushing', instruction.contents)
+               break; case 'juxtapose': console.log('juxtaposing')
+                  var b = left.stack.pop()
+                    , a = left.stack.pop()
+                  Stage.stage(a, b, left)
+                  return } } } })
    
    /* Staging */
    Stage = {}
    Stage.queue = []
    
-   function Staging(stagee, value) {
+   Staging = function(stagee, value, context) {
       this.stagee = stagee
-      this.value = value }
+      this.value = value
+      this.context = context }
    
-   Stage.stage = function(stagee, value) {
-      Stage.queue.push(new Staging(stagee, value)) }
+   Stage.stage = function(stagee, value, context) {
+      Stage.queue.push(new Staging(stagee, value, context)) }
    
    Stage.next = function() {
-      var staging = Stage.queue.shift()
+      var staging = Stage.queue.shift(); console.log('REALIZING:', staging)
       if (staging.stagee.native) {
-         staging.execution.native(staging.value) }
-      else if (staging.execution.handler.native) {
-         staging.execution.handler.native(staging.value) } }
+         staging.stagee.native(staging.stagee, staging.value, staging.context) }
+      else if (staging.stagee.handler.native) {
+         staging.stagee.handler.native(staging.stagee, staging.value, staging.context) } }
       
    /* Wrap it all up */
-   function run(text) {
-      stage(new Execution(parse(text)), null)
-      while (queue.length > 0) {
+   run = function(text) { var execution = new Execution(parse(text))
+      execution.locals.members.push(new Association(new Label('print'), new Execution(function(_, label, _) {
+         console.log(label.text) })))
+      Stage.stage(execution, null)
+      while (Stage.queue.length > 0) {
+         console.log('\nSTAGING QUEUE:', Stage.queue)
+         console.log('EXECUTION STACK:', execution.stack); console.log('INSTRUCTIONS LEFT:', execution.code)
          Stage.next() } }
    
    /* Testing */
-   var print = new Execution(function(label) { console.log(label.string) })
+   /*
+   var print = new Execution(function(label) { console.log(label.text) })
    Stage.stage(print, new Label('hi'))
-   Stage.next()
+   Stage.next() */
+   run('print asdf')
    
-})();
+   /*t = new Thing()
+   t.members.push(new Association(new Label('hi'), new Label('hello')))
+   console.log(t.handler.native(t, new Label('hi')))*/
+   
+
+//})();
