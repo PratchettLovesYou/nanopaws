@@ -89,28 +89,24 @@
    Stage.next = function() {
       var staging = Stage.queue.shift()
       if (staging.stagee.native) {
-         staging.stagee.native(staging.stagee, staging.value, staging.context) }
+         staging.stagee.native(staging.value, staging.context) }
       else if (staging.stagee.handler.native) {
          staging.stagee.handler.native(staging.stagee, staging.value, staging.context) } }
       
    /* Wrap it all up */
    run = function(text) { var execution = new Execution(parse(text))
-      execution.locals.members.push(new Association(new Label('print'), new Execution(function(_, label, _) {
+      execution.locals.members.push(new Association(new Label('print'), new Execution(function(label) {
          console.log(label.text) })))
       Stage.stage(execution, null)
       while (Stage.queue.length > 0) {
          Stage.next() } }
    
    /* Testing */
-   /*
-   var print = new Execution(function(label) { console.log(label.text) })
-   Stage.stage(print, new Label('hi'))
-   Stage.next() */
+   
    run('print asdf')
    
    /*t = new Thing()
    t.members.push(new Association(new Label('hi'), new Label('hello')))
    console.log(t.handler.native(t, new Label('hi')))*/
    
-
 //})();
