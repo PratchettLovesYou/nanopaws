@@ -102,11 +102,6 @@
          Stage.next() } }
    
    /* Testing */
-   
    run('print asdf')
-   
-   /*t = new Thing()
-   t.members.push(new Association(new Label('hi'), new Label('hello')))
-   console.log(t.handler.native(t, new Label('hi')))*/
-   
+      
 //})();
