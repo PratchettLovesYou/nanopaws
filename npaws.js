@@ -55,7 +55,7 @@
       return expr() }
    
    /* Execution */
-   Thing.prototype.handler = new Execution(function(left, right, context) { console.log('looking up')
+   Thing.prototype.handler = new Execution(function(left, right, context) {
       for (var i = 0; i < left.members.length; i++) {
          if (left.members[i].key.text === right.text) { Stage.stage(context, left.members[i].value) } }
          return null; })
@@ -65,10 +65,10 @@
          while (left.code.length > 0) { instruction = left.code.shift()
             switch (instruction.type) {
                case 'locals':
-                  left.stack.push(left.locals); console.log('pushing locals')
+                  left.stack.push(left.locals);
                break; case 'value':
-                  left.stack.push(instruction.contents); console.log('pushing', instruction.contents)
-               break; case 'juxtapose': console.log('juxtaposing')
+                  left.stack.push(instruction.contents);
+               break; case 'juxtapose':
                   var b = left.stack.pop()
                     , a = left.stack.pop()
                   Stage.stage(a, b, left)
@@ -87,7 +87,7 @@
       Stage.queue.push(new Staging(stagee, value, context)) }
    
    Stage.next = function() {
-      var staging = Stage.queue.shift(); console.log('REALIZING:', staging)
+      var staging = Stage.queue.shift()
       if (staging.stagee.native) {
          staging.stagee.native(staging.stagee, staging.value, staging.context) }
       else if (staging.stagee.handler.native) {
@@ -99,8 +99,6 @@
          console.log(label.text) })))
       Stage.stage(execution, null)
       while (Stage.queue.length > 0) {
-         console.log('\nSTAGING QUEUE:', Stage.queue)
-         console.log('EXECUTION STACK:', execution.stack); console.log('INSTRUCTIONS LEFT:', execution.code)
          Stage.next() } }
    
    /* Testing */
