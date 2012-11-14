@@ -43,7 +43,7 @@
       , scope = function() { var result
          return (result = bracket('{', '}')) && [new Value(new Execution(result))] }
       , label = function(){ whitespace(); var result = ''
-           while ( text[i] && /[^(){} \n]/.test(text[i]) )
+           while ( text[i] && /[^(){} \n;]/.test(text[i]) )
               result = result.concat(text[i++])
            return result && [new Value(new Label(result))] }
       
@@ -52,7 +52,7 @@
             result = result.concat(term).concat(new Juxtapose())
          return result }
       , program = function() { var line, result = expr()
-         while (character('\n') && (line = expr()))
+         while ((character('\n') || character(';')) && (line = expr()))
             result = result.concat(line)
          return result }
       
@@ -111,6 +111,6 @@
          if (Stage.queue.length == 0 && execution.code.length > 0) Stage.stage(execution, null) } }
    
    /* Testing */
-   run('set x y \n print (x)')
+   run(process.argv[2])
       
 })();
